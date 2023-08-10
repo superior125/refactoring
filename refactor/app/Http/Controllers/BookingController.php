@@ -35,6 +35,13 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
+        /**
+         * what if both conditions get false?
+         * what is __authenticatedUser? it should be auth()->user()
+         * to check the role it must have some methods like $user->isAdmin() or $user->isSuperAdmin or any authorization system
+         * 
+         */
+
         if($user_id = $request->get('user_id')) {
 
             $response = $this->repository->getUsersJobs($user_id);
@@ -54,6 +61,11 @@ class BookingController extends Controller
      */
     public function show($id)
     {
+
+        /**
+         * Should injected through model binding, like User $user instead of $id as param
+         * then $user->load('translatorJobRel.user')
+         */
         $job = $this->repository->with('translatorJobRel.user')->find($id);
 
         return response($job);
@@ -65,6 +77,12 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+
+        /**
+         * input data must be validated with authenticatin check
+         * then store the validation data rightaway
+         * can be created and attached to current user like $user->job()->create([]);
+         */
         $data = $request->all();
 
         $response = $this->repository->store($request->__authenticatedUser, $data);
@@ -80,6 +98,10 @@ class BookingController extends Controller
      */
     public function update($id, Request $request)
     {
+        /**
+         * input data must be validated with authenticatin check
+         * then store the validation data rightaway
+         */
         $data = $request->all();
         $cuser = $request->__authenticatedUser;
         $response = $this->repository->updateJob($id, array_except($data, ['_token', 'submit']), $cuser);
@@ -93,6 +115,10 @@ class BookingController extends Controller
      */
     public function immediateJobEmail(Request $request)
     {
+        /**
+         * admin email should be stored in the env file
+         * then store the validation data rightaway
+         */
         $adminSenderEmail = config('app.adminemail');
         $data = $request->all();
 
@@ -107,6 +133,10 @@ class BookingController extends Controller
      */
     public function getHistory(Request $request)
     {
+        /**
+         * this route should only be allowed with the user id as param
+         * user should be injeced through model binding
+         */
         if($user_id = $request->get('user_id')) {
 
             $response = $this->repository->getUsersJobsHistory($user_id, $request);
@@ -122,6 +152,10 @@ class BookingController extends Controller
      */
     public function acceptJob(Request $request)
     {
+        /**
+         * route should be allowed for authenticted user only
+         * user can be get with auth()->user()
+         */
         $data = $request->all();
         $user = $request->__authenticatedUser;
 
@@ -132,6 +166,11 @@ class BookingController extends Controller
 
     public function acceptJobWithId(Request $request)
     {
+        /**
+         * route should be allowed for authenticted user only
+         * user can be get with auth()->user()
+         * job object should be injeced through model binding
+         */
         $data = $request->get('job_id');
         $user = $request->__authenticatedUser;
 
@@ -146,6 +185,11 @@ class BookingController extends Controller
      */
     public function cancelJob(Request $request)
     {
+        /**
+         * route should be allowed for authenticted user only
+         * user can be get with auth()->user()
+         * job object should be injeced through model binding
+         */
         $data = $request->all();
         $user = $request->__authenticatedUser;
 
@@ -160,6 +204,10 @@ class BookingController extends Controller
      */
     public function endJob(Request $request)
     {
+        /**
+         * job object should be injeced through model binding
+         * only job id should be passed or job model should have an end job method
+         */
         $data = $request->all();
 
         $response = $this->repository->endJob($data);
@@ -170,6 +218,10 @@ class BookingController extends Controller
 
     public function customerNotCall(Request $request)
     {
+        /**
+         * method name doesn't make any sence
+         * 
+         */
         $data = $request->all();
 
         $response = $this->repository->customerNotCall($data);
@@ -184,6 +236,10 @@ class BookingController extends Controller
      */
     public function getPotentialJobs(Request $request)
     {
+        /**
+         * route should be allowed for authenticted user only
+         * user can be get with auth()->user()
+         */
         $data = $request->all();
         $user = $request->__authenticatedUser;
 
@@ -194,6 +250,13 @@ class BookingController extends Controller
 
     public function distanceFeed(Request $request)
     {
+        /**
+         * condition could be !empty() 
+         * OR like $distance  = $request->get('distance', '');
+         * Update functinality should be handled in the repository
+         * 
+         */
+
         $data = $request->all();
 
         if (isset($data['distance']) && $data['distance'] != "") {
